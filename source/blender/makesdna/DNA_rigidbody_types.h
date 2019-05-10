@@ -109,6 +109,9 @@ typedef struct RigidBodyOb {
 	/* Physics Parameters */
 	float mass;				/* how much object 'weighs' (i.e. absolute 'amount of stuff' it holds) */
 
+	float cdd_motion_threshold;		/* The threshold after which the motion (in one step) triggers continuous collision */
+	float cdd_swept_sphere_radius;		/* The swept sphere radius for continuous collision (0.0 by default) */
+
 	float friction;			/* resistance of object to movement */
 	float restitution;		/* how 'bouncy' object is when it collides */
 

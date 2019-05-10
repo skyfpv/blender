@@ -230,6 +230,30 @@ static void rna_RigidBodyOb_mass_set(PointerRNA *ptr, float value)
 #endif
 }
 
+static void rna_RigidBodyOb_cdd_motion_threshold_set(PointerRNA *ptr, float value)
+{
+	RigidBodyOb *rbo = (RigidBodyOb *)ptr->data;
+
+	rbo->cdd_motion_threshold = value;
+#ifdef WITH_BULLET
+	if (rbo->physics_object) {
+		RB_body_set_ccd_motion_threshold(rbo->physics_object, value);
+	}
+#endif
+}
+
+static void rna_RigidBodyOb_cdd_swept_sphere_radius_set(PointerRNA *ptr, float value)
+{
+	RigidBodyOb *rbo = (RigidBodyOb *)ptr->data;
+
+	rbo->cdd_swept_sphere_radius = value;
+#ifdef WITH_BULLET
+	if (rbo->physics_object) {
+		RB_body_set_ccd_swept_sphere_radius(rbo->physics_object, value);
+	}
+#endif
+}
+
 static void rna_RigidBodyOb_friction_set(PointerRNA *ptr, float value)
 {
 	RigidBodyOb *rbo = (RigidBodyOb *)ptr->data;
@@ -977,6 +1001,25 @@ static void rna_def_rigidbody_object(BlenderRNA *brna)
 	RNA_def_property_float_funcs(prop, NULL, "rna_RigidBodyOb_angular_damping_set", NULL);
 	RNA_def_property_ui_text(prop, "Angular Damping", "Amount of angular velocity that is lost over time");
 	RNA_def_property_update(prop, NC_OBJECT | ND_POINTCACHE, "rna_RigidBodyOb_reset");
+
+	/* Continuous Collision Parameters - CDD */
+  prop = RNA_def_property(srna, "cdd_motion_threshold", PROP_FLOAT, PROP_UNIT_LENGTH);
+	RNA_def_property_float_sdna(prop, NULL, "cdd motion threshold");
+	RNA_def_property_range(prop, 0.0f, 100.0f);
+	RNA_def_property_ui_range(prop, 0.0f, 100.0f, 0.01, 3);
+	RNA_def_property_float_default(prop, 0.0f);
+	RNA_def_property_float_funcs(prop, NULL, "rna_RigidBodyOb_cdd_motion_threshold_set", NULL);
+	RNA_def_property_ui_text(prop, "CCD Motion Threshold","The distance threshold (in one step) after which the objects motion triggers continuous collision","(used to prevent small, fast moving object from tunneling through static meshes)");
+	RNA_def_property_update(prop, NC_OBJECT | ND_POINTCACHE, "rna_RigidBodyOb_shape_reset");
+
+  prop = RNA_def_property(srna, "cdd_swept_sphere_radius", PROP_FLOAT, PROP_UNIT_LENGTH);
+	RNA_def_property_float_sdna(prop, NULL, "cdd swept sphere radius");
+	RNA_def_property_range(prop, 0.0f, 100.0f);
+	RNA_def_property_ui_range(prop, 0.0f, 100.0f, 0.01, 3);
+	RNA_def_property_float_default(prop, 0.0f);
+	RNA_def_property_float_funcs(prop, NULL, "rna_RigidBodyOb_cdd_swept_sphere_radius_set", NULL);
+	RNA_def_property_ui_text(prop, "CCD swept sphere radius","The radius of the continuous collision swept sphere", "(higher value may be needed for large, extremely fast moving objects)");
+	RNA_def_property_update(prop, NC_OBJECT | ND_POINTCACHE, "rna_RigidBodyOb_shape_reset");
 
 	/* Collision Parameters - Surface Parameters */
 	prop = RNA_def_property(srna, "friction", PROP_FLOAT, PROP_FACTOR);

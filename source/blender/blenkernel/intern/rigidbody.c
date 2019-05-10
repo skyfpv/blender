@@ -670,6 +670,9 @@ static void rigidbody_validate_sim_object(RigidBodyWorld *rbw, Object *ob, bool 
 
 		rbo->physics_object = RB_body_new(rbo->physics_shape, loc, rot);
 
+		RB_body_set_ccd_motion_threshold(rbo->physics_object, rbo->cdd_motion_threshold);
+		RB_body_set_ccd_swept_sphere_radius(rbo->physics_object, rbo->cdd_swept_sphere_radius);
+
 		RB_body_set_friction(rbo->physics_object, rbo->friction);
 		RB_body_set_restitution(rbo->physics_object, rbo->restitution);
 
